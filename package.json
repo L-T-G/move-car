@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "postinstall": "node ./scripts/postinstall.js",
+    "postinstall": "node ./scripts/f002.postinstall.js",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",

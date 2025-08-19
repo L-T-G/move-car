@@ -3,11 +3,11 @@ generator client {
 }
 
 // datasource db {
-//   provider = "sqlite" // 开发阶段可以用 SQLite，生产用 mysql/postgresql
+//   provider = "sqlite" // 开发阶段可以用 SQLite
 //   url      = "file:./dev.db"
 // }
 datasource db {
-  provider = "postgresql" // 开发阶段可以用 SQLite，生产用 mysql/postgresql
+  provider = "postgresql" // 生产用 mysql/postgresql
   url      = env("POSTGRES_PRISMA_URL")
 }
 
