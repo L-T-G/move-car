@@ -3,12 +3,15 @@ import { NextRequest, NextResponse } from "next/server";
 /**
  * 获取单个二维码信息
  * */
+type RouteContext = {
+  params: Promise<{ code: string }>;
+};
 export async function GET(
   _req: NextRequest, // 用不到时加下划线避免 eslint 警告
-  { params }: { params: { code: string } }
+  { params }: RouteContext
 ) {
   try {
-    const { code } = params;
+    const { code } = await params;
     const qr = await prisma.qRCode.findUnique({
       where: { code },
       select: {
