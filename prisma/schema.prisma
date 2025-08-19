@@ -2,9 +2,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// datasource db {
+//   provider = "sqlite" // 开发阶段可以用 SQLite，生产用 mysql/postgresql
+//   url      = "file:./dev.db"
+// }
 datasource db {
-  provider = "sqlite" // 开发阶段可以用 SQLite，生产用 mysql/postgresql
-  url      = "file:./dev.db"
+  provider = "postgresql" // 开发阶段可以用 SQLite，生产用 mysql/postgresql
+  url      = env("POSTGRES_PRISMA_URL")
 }
 
 model User {
@@ -22,7 +26,7 @@ model QRCode {
   code      String          @unique
   status    String          @default("available") // available / bound / disabled
   ownerId   Int?
-  owner     User?            @relation("UserOwnedQRCodes", fields: [ownerId], references: [id])
+  owner     User?           @relation("UserOwnedQRCodes", fields: [ownerId], references: [id])
   carPlate  String?
   createdAt DateTime        @default(now())
   updateAt  DateTime?       @updatedAt
