@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // 开发阶段可以用 SQLite，生产用 mysql/postgresql
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           Int             @id @default(autoincrement())
+  createdAt    DateTime        @default(now())
+  updateAt     DateTime?       @updatedAt
+  name         String
+  bindings     QRCodeBinding[]
+  ownedQRCodes QRCode[]        @relation("UserOwnedQRCodes")
+  phones       Phone[]
+}
+
+model QRCode {
+  id        Int             @id @default(autoincrement())
+  code      String          @unique
+  status    String          @default("available") // available / bound / disabled
+  ownerId   Int?
+  owner     User?            @relation("UserOwnedQRCodes", fields: [ownerId], references: [id])
+  carPlate  String?
+  createdAt DateTime        @default(now())
+  updateAt  DateTime?       @updatedAt
+  imageUrl  String? // 新增，存放二维码图片的 URL 或 OSS 路径
+  bindings  QRCodeBinding[]
+}
+
+model QRCodeBinding {
+  id        Int       @id @default(autoincrement())
+  qrcodeId  Int
+  userId    Int
+  isOwner   Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updateAt  DateTime? @updatedAt
+  qrcode    QRCode    @relation(fields: [qrcodeId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model Phone {
+  id        Int       @id @default(autoincrement())
+  number    String    @unique // 手机号
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+  updateAt  DateTime? @updatedAt
+}

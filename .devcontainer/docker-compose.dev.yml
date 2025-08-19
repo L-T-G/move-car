@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  devcontainer:
+    dns:
+      - 223.5.5.5
+
+    build:
+      context: ..
+      pull: true
+      dockerfile: .devcontainer/Dockerfile.dev
+
+    user: root
+    environment:
+      - TZ=Asia/Shanghai
+      - DEBUG=0
+    volumes:
+      - ..:/git_proj/move-car-system
+      - /root/.cache:/root/.cache
+      - /root/.ssh:/root/.ssh
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    command: sleep infinity
