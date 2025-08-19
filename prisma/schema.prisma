@@ -8,7 +8,7 @@ generator client {
 // }
 datasource db {
   provider = "postgresql" // 生产用 mysql/postgresql
-  url      = env("POSTGRES_PRISMA_URL")
+  url      = env("POSTGRES_URL_NON_POOLING")
 }
 
 model User {
