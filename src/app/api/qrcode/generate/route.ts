@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import * as QRCode from "qrcode"; // ← 关键改这里
 import prisma from "@/libs/prisma";
 import storage from "@/libs/storage";
@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
       const successful: { code: string; cosKey: string }[] = [];
       let completed = 0;
       let running = 0;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const tasks = Array.from({ length: count }).map((_, idx) => {
         return limit(async () => {
           const code = `QR-${nanoid(10)}`;

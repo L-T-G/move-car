@@ -4,11 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
  * 获取单个二维码信息
  * */
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest, // 用不到时加下划线避免 eslint 警告
   { params }: { params: { code: string } }
 ) {
   try {
-    const { code } = await params;
+    const { code } = params;
     const qr = await prisma.qRCode.findUnique({
       where: { code },
       select: {

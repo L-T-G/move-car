@@ -4,7 +4,7 @@
  * function:此页面主要功能为展示二维码绑定信息
  * permission：everyone
  * */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Form, Input, Button, message, Spin } from 'antd';
 import { fetchQRCodeDetail, bindQRCode } from '@/api/qrcode';
@@ -28,7 +28,7 @@ export default function QRCodePage() {
   const params = useParams<{ code: string }>()
   const [loading, setLoading] = useState(true)
   const [qrDetail, setQrDetail] = useState<QRCodeDetail | null>(null)
-  const loadDetail = async () => {
+  const loadDetail = useCallback(async () => {
     try {
       const res = await fetchQRCodeDetail(params.code)
       console.log(res)
@@ -38,7 +38,7 @@ export default function QRCodePage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [params.code])
   const onLoginFinish = async (values: BindPhone) => {
     try {
       await bindQRCode({
