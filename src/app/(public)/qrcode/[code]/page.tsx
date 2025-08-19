@@ -19,6 +19,10 @@ interface QRCodeDetail {
     phones: { number: string }[];
   };
 }
+interface BindPhone {
+  phone: string
+  smsCode: string
+}
 
 export default function QRCodePage() {
   const params = useParams<{ code: string }>()
@@ -30,12 +34,12 @@ export default function QRCodePage() {
       console.log(res)
       setQrDetail(res.data)
     } catch (error) {
-      message.error('二维码信息获取失败');
+      console.log('二维码信息获取失败：', error);
     } finally {
       setLoading(false);
     }
   }
-  const onLoginFinish = async (values: any) => {
+  const onLoginFinish = async (values: BindPhone) => {
     try {
       await bindQRCode({
         code: params.code,
@@ -44,8 +48,8 @@ export default function QRCodePage() {
       });
       message.success('绑定成功');
       loadDetail();
-    } catch (e) {
-      message.error('绑定失败');
+    } catch (error) {
+      console.log('绑定失败', error);
     }
   };
   useEffect(() => {
@@ -61,7 +65,7 @@ export default function QRCodePage() {
         <h1 className="text-2xl font-semibold mb-4">车辆绑定信息</h1>
         <p className="mb-2">您可以点击手机号直接拨打电话：</p>
         <ul className="space-y-2">
-          {qrDetail.owner?.phones.map((p: any, i: number) => (
+          {qrDetail.owner?.phones.map((p: { number: string }, i: number) => (
             <li key={i}>
               <a
                 href={`tel:${p.number}`}

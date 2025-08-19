@@ -1,4 +1,5 @@
 import prisma from "@/libs/prisma";
+import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -43,7 +44,7 @@ export async function PATCH(
       updateData.status = "bound"; // 绑定后状态改为 bound
     }
     // 开启事务，保证一致
-    const result = await prisma.$transaction(async (tx: any) => {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const updatedQr = await tx.qRCode.update({
         where: { id },
         data: updateData,
