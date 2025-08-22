@@ -11,27 +11,52 @@ datasource db {
   url      = env("POSTGRES_URL_NON_POOLING")
 }
 
+// 枚举定义
+enum Role {
+  USER
+  ADMIN
+}
+
+enum QRCodeStatus {
+  available // 可用
+  bound // 已绑定
+  disabled // 已禁用
+}
+
 model User {
   id           Int             @id @default(autoincrement())
   createdAt    DateTime        @default(now())
   updateAt     DateTime?       @updatedAt
-  name         String
+  name         String?
+  email        String          @unique // 新增邮箱字段，用于用户唯一标识
+  role         Role            @default(USER) // 角色区分
+  // 一个用户可以绑定多个二维码（多对多关系）
   bindings     QRCodeBinding[]
-  ownedQRCodes QRCode[]        @relation("UserOwnedQRCodes")
-  phones       Phone[]
+  // 一个用户可以拥有多个二维码（作为所有者）
+  ownedQRCodes QRCode[]        @relation("QRCodeOwner")
+
+  // 新增索引：优化按邮箱查询
+  @@index([email])
 }
 
 model QRCode {
-  id        Int             @id @default(autoincrement())
-  code      String          @unique
-  status    String          @default("available") // available / bound / disabled
-  ownerId   Int?
-  owner     User?           @relation("UserOwnedQRCodes", fields: [ownerId], references: [id])
-  carPlate  String?
-  createdAt DateTime        @default(now())
-  updateAt  DateTime?       @updatedAt
-  imageUrl  String? // 新增，存放二维码图片的 URL 或 OSS 路径
-  bindings  QRCodeBinding[]
+  id                 Int                  @id @default(autoincrement())
+  code               String               @unique
+  status             QRCodeStatus         @default(available) // available / bound / disabled
+  ownerId            Int?
+  // 二维码的所有者
+  owner              User?                @relation("QRCodeOwner", fields: [ownerId], references: [id])
+  carPlate           String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime?            @updatedAt
+  imageUrl           String? // 新增，存放二维码图片的 URL 或 OSS 路径
+  // 一个二维码可以被多个用户绑定
+  bindings           QRCodeBinding[]
+  // 一个二维码绑定多个手机号
+  QRCodePhoneBinding QRCodePhoneBinding[]
+
+  // 新增索引：优化按状态和创建时间查询
+  @@index([status, createdAt])
 }
 
 model QRCodeBinding {
@@ -40,16 +65,49 @@ model QRCodeBinding {
   userId    Int
   isOwner   Boolean   @default(false)
   createdAt DateTime  @default(now())
-  updateAt  DateTime? @updatedAt
+  updatedAt DateTime? @updatedAt
+  // 关联
   qrcode    QRCode    @relation(fields: [qrcodeId], references: [id])
   user      User      @relation(fields: [userId], references: [id])
+
+  // 确保同一用户不会重复绑定同一二维码
+  @@unique([qrcodeId, userId])
+  @@index([userId])
+  @@index([qrcodeId])
 }
 
 model Phone {
+  id             Int                  @id @default(autoincrement())
+  number         String               @unique // 手机号
+  createdAt      DateTime             @default(now())
+  updateAt       DateTime?            @updatedAt
+  // 该用户的手机号被绑定到哪些二维码
+  qrCodeBindings QRCodePhoneBinding[]
+
+  @@index([number])
+}
+
+// 二维码与手机号的绑定关系（多对多）
+model QRCodePhoneBinding {
   id        Int       @id @default(autoincrement())
-  number    String    @unique // 手机号
-  userId    Int
-  user      User      @relation(fields: [userId], references: [id])
+  qrcodeId  Int
+  phoneId   Int
+  isPublic  Boolean   @default(true)
   createdAt DateTime  @default(now())
-  updateAt  DateTime? @updatedAt
+  updatedAt DateTime? @updatedAt
+
+  qrcode QRCode @relation(fields: [qrcodeId], references: [id], onDelete: Cascade)
+  phone  Phone  @relation(fields: [phoneId], references: [id], onDelete: Cascade)
+
+  @@unique([qrcodeId, phoneId])
+  @@index([qrcodeId])
+  @@index([phoneId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@index([identifier], name: "identifier_index")
 }

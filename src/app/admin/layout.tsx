@@ -28,8 +28,7 @@ export default function AdminLayout({ children, }: { children: React.ReactNode }
                 {/* PC端标题 */}
                 <h2 className="hidden md:block text-xl font-bold mb-6 mt-6">帮挪车管理后台</h2>
                 <nav className="flex flex-col gap-3 mt-8 md:mt-0">
-                    <Link href="/admin" className="hover:text-blue-600" onClick={() => setIsOpen(false)}>首页</Link>
-                    <Link href="/admin/mobile" className="hover:text-blue-600" onClick={() => setIsOpen(false)}>Mobile Call</Link>
+                    {/* <Link href="/admin" className="hover:text-blue-600" onClick={() => setIsOpen(false)}>首页</Link> */}
                     <Link href="/admin/qrcode" className="hover:text-blue-600" onClick={() => setIsOpen(false)}>二维码管理</Link>
                 </nav>
             </aside>

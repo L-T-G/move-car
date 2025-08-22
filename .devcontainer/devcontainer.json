@@ -14,13 +14,13 @@
 		"vscode": {
 			"extensions": [
 				"mhutchie.git-graph",
-				"AMiner.codegeex",
 				"dbaeumer.vscode-eslint",
 				"esbenp.prettier-vscode",
 				"eamodio.gitlens",
 				"foxundermoon.shell-format",
 				"bradlc.vscode-tailwindcss",
 				"Prisma.prisma"
+				"Alibaba-Cloud.tongyi-lingma"
 			]
 		}
 	},

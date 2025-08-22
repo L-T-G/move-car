@@ -1,6 +1,6 @@
 // src/lib/prisma.ts
 import { PrismaClient } from "@prisma/client";
-
+import { initAdmin } from "./initAdmin";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
@@ -11,5 +11,11 @@ export const prisma =
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+async function setUp() {
+  await initAdmin();
+}
+// 模块加载时，执行一次
+setUp();
 
 export default prisma;

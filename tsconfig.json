@@ -20,6 +20,7 @@
         "name": "next"
       }
     ],
+    "types": ["next-auth", "./src/libs/next-auth.d.ts"],
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]

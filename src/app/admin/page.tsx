@@ -1,3 +1,12 @@
+
+"use client";
+
+import { AdminGuard } from "@/components/AdminGuard";
 export default function AdminHomePage() {
-  return <h1 className="text-2xl font-semibold">欢迎来到 Admin 后台首页</h1>;
+
+
+  return (
+    <AdminGuard><h1>欢迎管理员</h1>;</AdminGuard>
+
+  )
 }

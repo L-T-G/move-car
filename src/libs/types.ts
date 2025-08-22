@@ -1,3 +1,4 @@
+
 export interface Pagination {
   total: number;
   page: number;
@@ -31,3 +32,4 @@ export interface UpdateQRCodePayload {
   status: string;
   phones?: string[];
 }
+
