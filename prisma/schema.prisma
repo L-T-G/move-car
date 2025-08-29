@@ -8,7 +8,7 @@ generator client {
 // }
 datasource db {
   provider = "postgresql" // 生产用 mysql/postgresql
-  url      = env("POSTGRES_URL_NON_POOLING")
+  url      = env("POSTGRES_PRISMA_URL")
 }
 
 // 枚举定义
@@ -34,6 +34,7 @@ model User {
   bindings     QRCodeBinding[]
   // 一个用户可以拥有多个二维码（作为所有者）
   ownedQRCodes QRCode[]        @relation("QRCodeOwner")
+  password     String? // 仅admin 使用
 
   // 新增索引：优化按邮箱查询
   @@index([email])
@@ -76,38 +77,28 @@ model QRCodeBinding {
   @@index([qrcodeId])
 }
 
-model Phone {
-  id             Int                  @id @default(autoincrement())
-  number         String               @unique // 手机号
-  createdAt      DateTime             @default(now())
-  updateAt       DateTime?            @updatedAt
-  // 该用户的手机号被绑定到哪些二维码
-  qrCodeBindings QRCodePhoneBinding[]
-
-  @@index([number])
-}
 
 // 二维码与手机号的绑定关系（多对多）
 model QRCodePhoneBinding {
   id        Int       @id @default(autoincrement())
   qrcodeId  Int
-  phoneId   Int
   isPublic  Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
   qrcode QRCode @relation(fields: [qrcodeId], references: [id], onDelete: Cascade)
-  phone  Phone  @relation(fields: [phoneId], references: [id], onDelete: Cascade)
-
-  @@unique([qrcodeId, phoneId])
+  phone  String  
+  @@unique([qrcodeId, phone])
   @@index([qrcodeId])
-  @@index([phoneId])
+  @@index([phone])
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+model EmailOTP {
+  id        Int      @id @default(autoincrement())
+  email     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 
-  @@index([identifier], name: "identifier_index")
+  @@index([email])
 }

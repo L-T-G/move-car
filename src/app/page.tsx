@@ -12,7 +12,7 @@ export default function HomePage() {
         <p>未登录</p>
         <button
           onClick={() => {
-            router.push("/admin/login")
+            router.push("/login")
           }
           }
         >

@@ -103,7 +103,7 @@ export default function QRCodeAdminPage() {
         {
             key: "updatedAt",
             title: "更新时间",
-            dataIndex: "updateAt", // 注意接口字段名为 updateAt
+            dataIndex: "updatedAt", // 注意接口字段名为 updatedAt
             render: (date: string | null) =>
                 date ? new Date(date).toLocaleString() : "-"
         },
@@ -140,13 +140,11 @@ export default function QRCodeAdminPage() {
                     <a
                         className="mr-2"
                         onClick={() => {
-                            console.log("record", record)
                             if (record.status === "available") {
                                 // 跳转绑定主人页面
                                 router.push(`/qrcode/${encodeURIComponent(record.code)}`);
                                 return;
                             }
-                            console.log("执行了")
                             if (record.status === "disabled") {
                                 notification.warning({
                                     message: "禁止修改",

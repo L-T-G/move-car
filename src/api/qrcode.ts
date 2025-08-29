@@ -26,10 +26,41 @@ export async function fetchQRCodeDetail(code: string) {
   return request.get(`/qrcode/by-code/${code}`);
 }
 // 绑定二维码（登录并绑定手机号）
-export async function bindQRCode(data: {
-  code: string;
-  phone: string;
-  smsCode: string;
-}) {
-  return request.post(`/qrcode/bind`, data);
+export async function bindQRCode(
+  code: string,
+  data: {
+    ownerId: string;
+    phones: string[];
+  }
+) {
+  return request.post(`/qrcode/bind/${code}`, data);
+}
+// 根据二维码获取手机号
+export async function fetchPhonesByQrcode(qrId: string) {
+  return request.get(`/qrcode/bind/${qrId}`);
+}
+
+// 修改二维码绑定的手机号
+export async function updateQRCodePhones(
+  code: string,
+  data: {
+    ownerId: string;
+    phones: string[];
+  }
+) {
+  return request.patch(`/qrcode/bind/${code}`, data);
+}
+// 删除二维码绑定的手机号
+export async function deleteQRCodePhones(
+  qrId: string,
+  data: {
+    ownerId: string;
+    phones: string[];
+  }
+) {
+  const params = new URLSearchParams({
+    ownerId: data.ownerId,
+    phones: data.phones.join(","),
+  });
+  return request.delete(`/qrcode/bind/${qrId}?${params}`);
 }

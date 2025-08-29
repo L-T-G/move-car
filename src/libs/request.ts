@@ -1,8 +1,10 @@
 import axios from "axios";
 
+
+
 const request = axios.create({
   baseURL: "/api", // 统一前缀
-  timeout: 10000,  // 超时时间
+  timeout: 10000, // 超时时间
 });
 
 // 请求拦截器
@@ -19,7 +21,7 @@ request.interceptors.request.use(
 // 响应拦截器
 request.interceptors.response.use(
   (response) => {
-    const res = response.data;
+    const res = response.data
     if (!res.success) {
       return Promise.reject(new Error(res.message || "请求失败"));
     }
@@ -27,7 +29,7 @@ request.interceptors.response.use(
   },
   (error) => {
     console.error("请求错误:", error);
-    return Promise.reject(error);
+    return Promise.reject(error.response);
   }
 );
 

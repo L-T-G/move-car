@@ -5,10 +5,6 @@ import { NextRequest, NextResponse } from "next/server";
 /**
  * 修改二维码记录
  * */
-interface UpdateData {
-  status?: string;
-  ownerId?: number;
-}
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
@@ -37,7 +33,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
       );
     }
     // 更新数据容器
-    const updateData: UpdateData = {};
+    const updateData: Prisma.QRCodeUncheckedUpdateInput = {};
     if (status) updateData.status = status;
     //  如果二维码处于 available 且传了 ownerId，允许绑定 owner
     if (!qr.ownerId && ownerId) {
@@ -51,19 +47,15 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
           where: { id: numericId },
           data: updateData,
         });
-        if (
-          updatedQr.status === "bound" &&
-          Array.isArray(phones) &&
-          updatedQr.ownerId
-        ) {
-          await tx.phone.deleteMany({
-            where: { userId: updatedQr.ownerId },
+        if (updatedQr.status === "bound" && Array.isArray(phones)) {
+          await tx.qRCodePhoneBinding.deleteMany({
+            where: { qrcodeId: updatedQr.id },
           });
           if (phones.length > 0) {
-            await tx.phone.createMany({
-              data: phones.map((number: string) => ({
-                number,
-                userId: updatedQr.ownerId!,
+            await tx.qRCodePhoneBinding.createMany({
+              data: phones.map((phone: string) => ({
+                phone,
+                qrcodeId: updatedQr.id,
               })),
             });
           }
@@ -73,7 +65,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     );
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
-    console.error(error);
+    console.error("update qrcode error",error);
     return NextResponse.json(
       { success: false, message: "更新二维码失败" },
       { status: 500 }

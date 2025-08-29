@@ -10,7 +10,7 @@ export interface QRCode {
   code: string;
   status: string;
   createdAt: string;
-  updateAt: string | null;
+  updatedAt: string | null;
   imageUrl: string | null;
   owner?: {
     id: number;

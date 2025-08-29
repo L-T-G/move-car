@@ -1,20 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
-
-/**
- * 按条件查询二维码记录
- * */
-interface WhereCondition {
-  code?: { contains: string };
-  status?: string;
-  owner?: {
-    phones: {
-      some: {
-        number: { contains: string };
-      };
-    };
-  };
-}
+import { QRCodeStatus, Prisma } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
   try {
@@ -27,20 +13,21 @@ export async function GET(req: NextRequest) {
     const code = searchParams.get("code") || undefined;
     const status = searchParams.get("status") || undefined;
     // 拼接 where 条件
-    const where: WhereCondition = {};
+    const where: Prisma.QRCodeWhereInput = {};
     if (code) {
       where.code = { contains: code }; // 模糊查询
     }
 
-    if (status) {
-      where.status = status; // 精确匹配
+    if (
+      status &&
+      Object.values(QRCodeStatus).includes(status as QRCodeStatus)
+    ) {
+      where.status = status as QRCodeStatus; // 精确匹配
     }
     if (phone) {
-      where.owner = {
-        phones: {
-          some: {
-            number: { contains: phone }, // 模糊匹配手机号
-          },
+      where.QRCodePhoneBinding = {
+        some: {
+          phone: { contains: phone } //模糊匹配手机号
         },
       };
     }
@@ -56,16 +43,19 @@ export async function GET(req: NextRequest) {
         code: true,
         status: true,
         createdAt: true,
-        updateAt: true,
+        updatedAt: true,
         imageUrl: true,
         ownerId: true,
         owner: {
           select: {
             id: true,
             name: true,
-            phones: {
-              select: { number: true },
-            },
+            email: true,
+          },
+        },
+        QRCodePhoneBinding: {
+          select: {
+            phone: true,
           },
         },
       },
@@ -81,7 +71,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("get qrlist error",error);
     return NextResponse.json(
       { success: false, message: "查询二维码失败" },
       { status: 500 }

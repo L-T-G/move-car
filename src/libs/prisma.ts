@@ -5,9 +5,9 @@ import { initAdmin } from "./initAdmin";
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 export const prisma =
-  globalForPrisma.prisma ||
+  globalForPrisma.prisma ??
   new PrismaClient({
-    log: ["query"], // 开发模式下可以打开日志
+    log: process.env.NODE_ENV !== "development" ? ["query"] : [], // 开发模式下可以打开日志
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;

@@ -19,17 +19,18 @@ export async function GET(
         code: true,
         status: true,
         createdAt: true,
-        updateAt: true,
+        updatedAt: true,
         imageUrl: true,
         owner: {
           select: {
             id: true,
             name: true,
-            phones: {
-              select: {
-                number: true,
-              },
-            },
+            email: true,
+          },
+        },
+        QRCodePhoneBinding: {
+          select: {
+            phone: true,
           },
         },
       },
@@ -40,9 +41,12 @@ export async function GET(
         { status: 404 }
       );
     }
-    return NextResponse.json({ success: true, data: qr });
+    return NextResponse.json({
+      success: true,
+      data: { ...qr, phones: qr.QRCodePhoneBinding.map((p) => p.phone) },
+    });
   } catch (error) {
-    console.error("获取二维码失败:", error);
+    console.error("get qrcode error:", error);
     return NextResponse.json(
       { success: false, message: "服务器错误" },
       { status: 500 }
